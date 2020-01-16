@@ -25,10 +25,18 @@ def sync_inference(exec_net, input_blob, image):
     return result
 
 def draw_points(image, points, draw=True):
-    white = [255,255,255]
+    blue = [0,255,0]
+    points = list(points.values())[0].flatten()
+    print ("The points are :", points)
+    
+    thickness = -1
+    #image = np.zeros_like(image)
     for x, y in zip(*[iter(points)]*2):
-        image[48*x, 48*y] = white
+        cv2.circle(image, (int(48*x),int(48*y)), 2, blue, thickness)
+        print(48*x,48*y)
+        #image[48*x, 48*y] = white
         
+    #return np.zeros_like(image)
     return image
 
 def perform_inference(exec_net, input_image, input_shape):
@@ -48,9 +56,13 @@ def perform_inference(exec_net, input_image, input_shape):
 
     # Perform either synchronous
     output = sync_inference(exec_net, input_blob, preprocessed_image)
-    img_output = draw_points(preprocessed_image, output)
-    img_output = img_output.reshape(3, 48, 48)
+    img_output = preprocessed_image.reshape(3, 48, 48)
     img_output = img_output.transpose((1,2,0))
+    img_output = draw_points(img_output, output)
+    
+    #img_output = draw_points(preprocessed_image, output)
+    #img_output = img_output.reshape(3, 48, 48)
+    #img_output = img_output.transpose((1,2,0))
     img_output = cv2.resize(img_output, (image.shape[1], image.shape[0]))
 
 
